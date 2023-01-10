@@ -1,0 +1,124 @@
+import { React, useState, useEffect } from 'react'
+import './tictactoe.css'
+import { socket } from '../../socket.js'
+import { Modal, Text, Button, Input } from '@mantine/core';
+
+const TicTacToe = (props) => {
+    const [opened, setOpened] = useState(true);
+    const [winnerDialog, setWinnerDialog] = useState(false);
+    const [name, setName] = useState('')
+    const [player2, setPlayer2] = useState('')
+    const [gameOver, setGameOver] = useState('')
+    const [room, setRoom] = useState('')
+    const [gameState, setGameState] = useState({ 0: '', 1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '', 8: '' });
+    const [pressedKey, setPressedKey] = useState(null);
+    const [scoreValues, setScoreValues] = useState(null);
+    const [currentPlayer, setCurrentPlayer] = useState('O');
+    const [symbol, setSymbol] = useState('');
+    const [noturMove, setNoturMove] = useState('')
+
+    const handleClick = (index) => {
+        if (currentPlayer !== symbol) {
+            setNoturMove("not your move!!!")
+        }
+        else {
+            setPressedKey(true);
+            setGameState(gameState => ({ ...gameState, [index]: currentPlayer }))
+            setCurrentPlayer(currentPlayer => (currentPlayer === "O" ? "X" : "O"))
+        }
+
+    }
+
+    const populateGame = () => {
+        if (gameState != null) {
+            var result = [];
+            console.log(gameState)
+            Object.keys(gameState).forEach((currentValue, index) => {
+                result.push(<div id="space0" key={index} onClick={() => handleClick(index)} className="space">{gameState[currentValue]}</div>)
+            })
+
+        }
+        return result
+    }
+
+    useEffect(() => {
+        if (pressedKey) {
+            console.log("effect 2", gameState, currentPlayer)
+            socket.emit("update-game-state", { state: gameState, room })
+            socket.emit("current-player", { room, currentPlayer });
+            setPressedKey(false);
+        }
+    }, [gameState, currentPlayer])
+
+    useEffect(() => {
+        socket.on("update-game-state", matrix => setGameState(matrix));
+        socket.on("players-data", data => {
+            const symbol_ = data.filter(player => player.id === socket.id)[0].symbol;
+            const otherPlayer = data.filter(player => player.id !== socket.id)[0];
+            if (otherPlayer) setPlayer2(otherPlayer.name)
+            if (data.length >= 1) {
+                setSymbol(symbol_)
+            } else {
+                setSymbol(symbol_)
+            }
+        });
+        socket.on("current-player", player => {
+            setNoturMove('')
+            setCurrentPlayer(player)
+        })
+        socket.on("game-over", winner => {
+            setGameOver(winner)
+            setWinnerDialog(true)
+        })
+    })
+    const spaces = populateGame();
+
+    return (
+        <div className='tictactoe'>
+            <Modal
+                opened={opened}
+                onClose={() => setOpened(false)}
+                title="Create or Join a room"
+            >
+                <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                    <label> Name: <Input onChange={(e) => setName(e.target.value)} /> </label> <br />
+                    <label> Room: <Input onChange={(e) => setRoom(e.target.value)} /> </label> <br />
+                    <Button style={{ marginTop: "1rem" }} onClick={() => {
+                        setOpened(false);
+                        socket.emit('join-room', { room: room, game: 'tictactoe', name })
+                    }}>submit</Button>
+                </div>
+            </Modal>
+            <Modal
+                opened={winnerDialog}
+                withCloseButton
+                title={`Winner!!!`}
+                onClose={() => setWinnerDialog(false)}
+            >
+                <Text size="lg" style={{ marginBottom: 10 }} weight={500}>
+                    🎉 {symbol === gameOver ? name : player2}
+                </Text>
+            </Modal>
+            <div className="full-page" id="full-page">
+                <div className="options startReset flex-row wrap">
+                    <div id="start">Start</div>
+                    <div id="reset">Reset</div>
+                </div>
+                <div className="scoreboard">
+                    <div className="Room">Room: {room}</div>
+                    <div className="player1">{`${name} (${symbol})`}: 0</div>
+                    <div className="player2">{`${player2} (${symbol === "O" ? "X" : "O"})`}: 0</div>
+                    <div className='turn'>Turn: {currentPlayer}</div>
+                </div>
+                <div>{noturMove}</div>
+                <div className="boardcontainer">
+                    <div className="board">
+                        {spaces}
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export default TicTacToe;
