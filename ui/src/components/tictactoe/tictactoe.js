@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import './tictactoe.css'
 import { socket } from '../../socket.js'
 import { Modal, Text, Button, Input } from '@mantine/core';
