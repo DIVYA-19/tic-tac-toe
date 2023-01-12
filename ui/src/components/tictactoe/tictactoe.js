@@ -15,11 +15,13 @@ const TicTacToe = (props) => {
     const [scoreValues, setScoreValues] = useState(null);
     const [currentPlayer, setCurrentPlayer] = useState('O');
     const [symbol, setSymbol] = useState('');
-    const [noturMove, setNoturMove] = useState('')
+    const [message, setMessage] = useState('')
 
     const handleClick = (index) => {
         if (currentPlayer !== symbol) {
-            setNoturMove("not your move!!!")
+            setMessage("not your move!!!")
+        } else if (player2 == "") {
+            setMessage("Other player hasn't joined yet!")
         }
         else {
             setPressedKey(true);
@@ -63,7 +65,7 @@ const TicTacToe = (props) => {
             }
         });
         socket.on("current-player", player => {
-            setNoturMove('')
+            setMessage('')
             setCurrentPlayer(player)
         })
         socket.on("game-over", winner => {
@@ -110,7 +112,7 @@ const TicTacToe = (props) => {
                     <div className="player2">{`${player2} (${symbol === "O" ? "X" : "O"})`}: 0</div>
                     <div className='turn'>Turn: {currentPlayer}</div>
                 </div>
-                <div>{noturMove}</div>
+                <div>{message}</div>
                 <div className="boardcontainer">
                     <div className="board">
                         {spaces}
