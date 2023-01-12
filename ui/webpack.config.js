@@ -21,6 +21,7 @@ const config = {
         open: true,
         host: 'localhost',
     },
+    devtool: false,
     plugins: [
         new HtmlWebpackPlugin({
             template: 'public/index.html',
