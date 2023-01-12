@@ -1,4 +1,5 @@
 const express = require('express')
+const bodyParser = require('body-parser')
 const socket = require('socket.io')
 const cors = require('cors')
 const Player = require('./Player')
@@ -9,6 +10,13 @@ require('dotenv').config()
 
 const app = express()
 const PORT = process.env.PORT || 4000;
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json())
+
+app.get('/', (req, res) => {
+    res.send("hello")
+})
 
 var server = app.listen(PORT, () => {
     console.log(`server running on port ${PORT}`)
