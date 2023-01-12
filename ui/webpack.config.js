@@ -24,7 +24,7 @@ const config = {
     devtool: false,
     plugins: [
         new HtmlWebpackPlugin({
-            template: 'public/index.html',
+            template: 'dist/index.html',
         }),
         new webpack.ProvidePlugin({
             "React": "react",
