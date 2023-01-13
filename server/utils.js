@@ -7,6 +7,13 @@ const gameOver = (state) => {
             winner = state[position[0]];
         }
     })
+    if (!winner) {
+        const emptyPositions = Object.keys(state).filter(position => state[position] == "");
+        console.log("empty: ", emptyPositions)
+        if (!emptyPositions) {
+            return "draw";
+        }
+    }
     return winner;
 }
 
