@@ -15,9 +15,11 @@ const TicTacToe = (props) => {
     const [scoreValues, setScoreValues] = useState(null);
     const [currentPlayer, setCurrentPlayer] = useState('O');
     const [symbol, setSymbol] = useState('');
-    const [message, setMessage] = useState('')
+    const [message, setMessage] = useState('');
+    const [resetClicked, setResetClicked] = useState(false);
 
     const handleClick = (index) => {
+        if (gameState[index] !== "") return
         if (currentPlayer !== symbol) {
             setMessage("not your move!!!")
         } else if (player2 == "") {
@@ -29,6 +31,11 @@ const TicTacToe = (props) => {
             setCurrentPlayer(currentPlayer => (currentPlayer === "O" ? "X" : "O"))
         }
 
+    }
+
+    const reset = () => {
+        setResetClicked(true)
+        setGameState({ 0: '', 1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '', 8: '' })
     }
 
     const populateGame = () => {
@@ -44,11 +51,12 @@ const TicTacToe = (props) => {
     }
 
     useEffect(() => {
-        if (pressedKey) {
-            console.log("effect 2", gameState, currentPlayer)
+        if (pressedKey || resetClicked) {
             socket.emit("update-game-state", { state: gameState, room })
             socket.emit("current-player", { room, currentPlayer });
             setPressedKey(false);
+            setResetClicked(false);
+            setWinnerDialog(false);
         }
     }, [gameState, currentPlayer])
 
@@ -98,13 +106,14 @@ const TicTacToe = (props) => {
                 onClose={() => setWinnerDialog(false)}
             >
                 <Text size="lg" style={{ marginBottom: 10 }} weight={500}>
-                    🎉 {symbol === gameOver ? name : player2}
+                    {gameOver == "draw" ? gameOver : (symbol === gameOver ? `🎉 ${name}` : `🎉 ${player2}`)}
                 </Text>
+                {gameOver == "draw" ? <Button>restart</Button> : null}
             </Modal>
             <div className="full-page" id="full-page">
                 <div className="options startReset flex-row wrap">
                     <div id="start">Start</div>
-                    <div id="reset">Reset</div>
+                    <div id="reset" onClick={reset}>Reset</div>
                 </div>
                 <div className="scoreboard">
                     <div className="Room">Room: {room}</div>
