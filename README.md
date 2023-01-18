@@ -1,6 +1,10 @@
 # tic-tac-toe
 Online game to play friends using same room
 
+- used socket.io to communicate between end points
+- used reactjs to develop ui and mantine framework for widgets
+- node js to develop backend
+
 # steps to run the code
 
 ## UI
