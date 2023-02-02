@@ -9,8 +9,7 @@ const gameOver = (state) => {
     })
     if (!winner) {
         const emptyPositions = Object.keys(state).filter(position => state[position] == "");
-        console.log("empty: ", emptyPositions)
-        if (!emptyPositions) {
+        if (emptyPositions.length <= 0) {
             return "draw";
         }
     }

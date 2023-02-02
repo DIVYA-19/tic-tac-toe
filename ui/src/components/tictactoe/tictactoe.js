@@ -108,7 +108,7 @@ const TicTacToe = (props) => {
                 <Text size="lg" style={{ marginBottom: 10 }} weight={500}>
                     {gameOver == "draw" ? gameOver : (symbol === gameOver ? `🎉 ${name}` : `🎉 ${player2}`)}
                 </Text>
-                {gameOver == "draw" ? <Button>restart</Button> : null}
+                {gameOver == "draw" ? <Button onClick={reset}>restart</Button> : null}
             </Modal>
             <div className="full-page" id="full-page">
                 <div className="options startReset flex-row wrap">
